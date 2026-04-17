@@ -89,3 +89,66 @@ def plot_scatter(ax, timestamps, sensor_a, sensor_b, title='Sensor readings vs T
     ax.grid(alpha=0.25)
 
     return None
+# Create plot_histogram(sensor_a, sensor_b, timestamps, ax) that draws
+# the histogram from the notebook onto the given Axes object.
+# NumPy-style docstring. Modifies ax in place, returns None.
+def plot_histogram(ax, sensor_a, sensor_b, bins=30, alpha=0.5, title='Overlaid histogram of Sensor A and Sensor B'):
+    """
+    Overlaid histogram comparing two sensor temperature distributions.
+ 
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes object to draw on (modified in place).
+    sensor_a : array_like, shape (N,)
+        Sensor A temperature readings (°C).
+    sensor_b : array_like, shape (N,)
+        Sensor B temperature readings (°C).
+    bins : int, optional
+        Number of histogram bins (default 30).
+    alpha : float, optional
+        Transparency for histogram bars (default 0.5).
+    title : str, optional
+        Plot title (default provided).
+ 
+    Returns
+    -------
+    None
+        Draws on `ax` in place and returns None.
+ 
+    Notes
+    -----
+    Uses shared bin edges so the two histograms are directly comparable.
+    Draws vertical dashed lines at each sensor's mean and includes a legend.
+    """
+    import numpy as np
+ 
+    sa = np.asarray(sensor_a, dtype=np.float64)
+    sb = np.asarray(sensor_b, dtype=np.float64)
+ 
+    if sa.ndim != 1 or sb.ndim != 1:
+        raise ValueError("sensor_a and sensor_b must be 1-D arrays")
+    if sa.shape[0] != sb.shape[0]:
+        # Histograms may be plotted with unequal lengths, but warn/handle gracefully:
+        # proceed without enforcing equal length; remove this check if unequal lengths are allowed.
+        pass
+ 
+    # shared bin edges: bins -> number of intervals
+    edges = np.linspace(min(sa.min(), sb.min()), max(sa.max(), sb.max()), bins + 1)
+ 
+    color_a = 'blue'
+    color_b = 'orange'
+ 
+    ax.hist(sa, bins=edges, color=color_a, alpha=alpha, edgecolor='k', label='Sensor A')
+    ax.hist(sb, bins=edges, color=color_b, alpha=alpha, edgecolor='k', label='Sensor B')
+ 
+    # vertical dashed lines at means
+    ax.axvline(sa.mean(), color=color_a, linestyle='--', linewidth=1.5, label=f'Sensor A mean = {sa.mean():.2f} °C')
+    ax.axvline(sb.mean(), color=color_b, linestyle='--', linewidth=1.5, label=f'Sensor B mean = {sb.mean():.2f} °C')
+ 
+    ax.set_xlabel('Temperature (°C)')
+    ax.set_ylabel('Count')
+    ax.set_title(title)
+    ax.legend(loc='best')
+ 
+    return None
