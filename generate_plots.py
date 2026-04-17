@@ -152,3 +152,75 @@ def plot_histogram(ax, sensor_a, sensor_b, bins=30, alpha=0.5, title='Overlaid h
     ax.legend(loc='best')
  
     return None
+# Create box_plot(sensor_a, sensor_b, timestamps, ax) that draws
+# the box_plot from the notebook onto the given Axes object.
+# NumPy-style docstring. Modifies ax in place, returns None.
+def plot_boxplot(ax, sensor_a, sensor_b, labels=('Sensor A', 'Sensor B'), title='Side-by-side box plot: Sensor A vs Sensor B'):
+    """
+    Side-by-side box plot comparing two sensor temperature distributions.
+ 
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes object to draw on (modified in place).
+    sensor_a : array_like, shape (N,)
+        Sensor A temperature readings (°C).
+    sensor_b : array_like, shape (M,)
+        Sensor B temperature readings (°C).
+    labels : tuple of str, optional
+        Labels for the two boxes (default ('Sensor A', 'Sensor B')).
+    title : str, optional
+        Plot title.
+ 
+    Returns
+    -------
+    None
+        Draws on `ax` in place and returns None.
+ 
+    Notes
+    -----
+    Draws boxplots side-by-side, colors the boxes, and adds a horizontal dashed
+     line at the overall mean of both sensors combined.
+    """
+    import numpy as np
+    from matplotlib.patches import Patch
+ 
+    sa = np.asarray(sensor_a, dtype=np.float64)
+    sb = np.asarray(sensor_b, dtype=np.float64)
+ 
+    if sa.ndim != 1 or sb.ndim != 1:
+        raise ValueError("sensor_a and sensor_b must be 1-D arrays")
+ 
+    # overall mean across both sensors
+    overall_mean = np.mean(np.concatenate([sa, sb]))
+ 
+    # Create boxplot (patch_artist=True so boxes can be colored)
+    bp = ax.boxplot([sa, sb], labels=list(labels), patch_artist=True)
+ 
+    # Color the boxes
+    colors = ['C0', 'C1']
+    for patch, color in zip(bp['boxes'], colors):
+        patch.set_facecolor(color)
+        patch.set_edgecolor('k')
+ 
+    # Style medians
+    for median in bp.get('medians', []):
+        median.set(color='black', linewidth=1.2)
+ 
+    # Axis labels / title
+    ax.set_xlabel('')
+    ax.set_xticks([1, 2])
+    ax.set_xticklabels(labels)
+    ax.set_ylabel('Temperature (deg C)')
+    ax.set_title(title)
+ 
+    # Horizontal dashed line at overall mean
+    mean_line = ax.axhline(overall_mean, color='k', linestyle='--', linewidth=1.0)
+ 
+    # Make a legend: colored patches for the sensors + the mean line
+    handles = [Patch(facecolor=colors[0], edgecolor='k', label=labels[0]),
+                Patch(facecolor=colors[1], edgecolor='k', label=labels[1]),mean_line]
+    labels_legend = [labels[0], labels[1], f'Overall mean = {overall_mean:.2f} °C']
+    ax.legend(handles=handles, labels=labels_legend, loc='best')
+ 
+    return None
