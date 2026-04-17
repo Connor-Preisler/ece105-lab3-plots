@@ -224,3 +224,63 @@ def plot_boxplot(ax, sensor_a, sensor_b, labels=('Sensor A', 'Sensor B'), title=
     ax.legend(handles=handles, labels=labels_legend, loc='best')
  
     return None
+# Create main() that generates data, creates a 1x3 subplot figure,
+# calls each plot function, adjusts layout, and saves as sensor_analysis.png
+# at 150 DPI with tight bounding box.
+def main(seed=4309, outdir='.', show=False):
+    """
+    Generate data and save scatter, histogram, and boxplot PNGs.
+ 
+    Parameters
+    ----------
+    seed : int, optional
+        RNG seed passed to generate_data (default 4309).
+    outdir : str, optional
+        Directory where PNG files will be saved (default current directory).
+    show : bool, optional
+        If True, display each figure interactively with plt.show() (default False).
+ 
+    Returns
+    -------
+    None
+        Files written: scatter.png, histogram.png, boxplot.png in `outdir`.
+    """
+    import os
+    import matplotlib.pyplot as plt
+ 
+    os.makedirs(outdir, exist_ok=True)
+ 
+    # Generate data
+    timestamps, sensor_a, sensor_b = generate_data(seed)
+ 
+    # Scatter plot
+    fig, ax = plt.subplots(figsize=(8, 4))
+    plot_scatter(ax, timestamps, sensor_a, sensor_b, title='Sensor readings vs Time')
+    fig.savefig(os.path.join(outdir, 'scatter.png'), dpi=300)
+    if show:
+        plt.show()
+    plt.close(fig)
+ 
+    # Histogram
+    fig, ax = plt.subplots(figsize=(8, 4))
+    plot_histogram(ax, sensor_a, sensor_b, bins=30, alpha=0.5,title='Overlaid histogram of Sensor A and Sensor B')
+    fig.savefig(os.path.join(outdir, 'histogram.png'), dpi=300)
+    if show:
+        plt.show()
+    plt.close(fig)
+ 
+    # Boxplot
+    fig, ax = plt.subplots(figsize=(6, 4))
+    plot_boxplot(ax, sensor_a, sensor_b,
+                labels=('Sensor A', 'Sensor B'),
+                title='Side-by-side box plot: Sensor A vs Sensor B')
+    fig.savefig(os.path.join(outdir, 'boxplot.png'), dpi=300)
+    if show:
+        plt.show()
+    plt.close(fig)
+ 
+    return None
+ 
+ 
+if __name__ == '__main__':
+     main()
